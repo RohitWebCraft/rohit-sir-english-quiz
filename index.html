@@ -72,10 +72,33 @@
   .life{flex:1; padding:10px 4px; border-radius:10px; border:1px solid var(--accent); background:transparent; color:var(--accent); font-weight:700; cursor:pointer; font-size:.85rem;}
   .life[disabled]{opacity:.35; border-color:var(--border); color:var(--muted); cursor:default;}
   .opt.gone{opacity:.12; pointer-events:none; filter:blur(2px);}
+  /* Upgraded Game Banner Style */
+  .upgrade-banner {
+    display: block;
+    background: linear-gradient(135deg, #e0561b, #f39c12);
+    color: #ffffff;
+    text-align: center;
+    padding: 14px 16px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(224, 86, 27, 0.4);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .upgrade-banner:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(224, 86, 27, 0.6);
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
+  <!-- New Upgraded Game Link Banner -->
+  <a href="https://rohitwebcraft.github.io/Rohit-Sir-English-Quest/" class="upgrade-banner" target="_blank">
+    🎮 Try our new upgraded game ➔ Rohit Sir English Quest
+  </a>
   <h1>📘 Rohit Sir English Quiz</h1>
   <div class="sub">FEA English Learning Quiz — Day-wise (Day 17–93)<br><b style="color:var(--accent)">Made by Rohit Sir</b></div>
   <div id="app"></div>
