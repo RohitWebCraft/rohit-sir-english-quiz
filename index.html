@@ -72,33 +72,22 @@
   .life{flex:1; padding:10px 4px; border-radius:10px; border:1px solid var(--accent); background:transparent; color:var(--accent); font-weight:700; cursor:pointer; font-size:.85rem;}
   .life[disabled]{opacity:.35; border-color:var(--border); color:var(--muted); cursor:default;}
   .opt.gone{opacity:.12; pointer-events:none; filter:blur(2px);}
-  /* Upgraded Game Banner Style */
-  .upgrade-banner {
-    display: block;
-    background: linear-gradient(135deg, #e0561b, #f39c12);
-    color: #ffffff;
-    text-align: center;
-    padding: 14px 16px;
-    border-radius: 12px;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 1.05rem;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(224, 86, 27, 0.4);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  .upgrade-banner:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(224, 86, 27, 0.6);
-  }
+  .timerbar{height:6px; background:#232738; border-radius:4px; overflow:hidden; margin-bottom:12px;}
+  .timerfill{height:100%; width:100%; background:var(--accent2); transition:width .25s linear;}
+  .timerfill.warn{background:#ef476f;}
+  #timeTxt.warn{color:#ef476f;}
+  .confetti{position:fixed;top:-30px;font-size:1.4rem;animation:fall 2.5s linear forwards;z-index:99;pointer-events:none;}
+  @keyframes fall{to{transform:translateY(110vh) rotate(360deg);}}
+  .sec-title{color:var(--muted);font-size:.85rem;margin:2px 0 10px;}
+  .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .btn-row .mode-btn{margin-bottom:0;font-size:.9rem;padding:12px 6px;background:#232738;color:var(--text);}
+  .quest-banner{display:block; text-align:center; text-decoration:none; color:#fff; font-weight:700; font-size:.95rem; padding:14px 12px; margin-bottom:18px; border-radius:12px; background:linear-gradient(135deg,#e8571e,#f59e0b); box-shadow:0 4px 18px rgba(245,120,20,.35);}
+  .quest-banner:active{transform:scale(.98);}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <!-- New Upgraded Game Link Banner -->
-  <a href="https://rohitwebcraft.github.io/Rohit-Sir-English-Quest/" class="upgrade-banner" target="_blank">
-    🎮 Try our new upgraded game ➔ Rohit Sir English Quest
-  </a>
+  <a class="quest-banner" href="https://rohitwebcraft.github.io/Rohit-Sir-English-Quest/" target="_blank" rel="noopener">🎮 Try our new upgraded game ➜ Rohit Sir English Quest</a>
   <h1>📘 Rohit Sir English Quiz</h1>
   <div class="sub">FEA English Learning Quiz — Day-wise (Day 17–93)<br><b style="color:var(--accent)">Made by Rohit Sir</b></div>
   <div id="app"></div>
@@ -2501,19 +2490,25 @@ function fisherYatesShuffle(arr){
 }
 
 function renderHome(){
-  const days = Object.keys(QUIZ_DATA);
-  let opts = days.map(d=>`<option value="${d}">Day ${d} — ${QUIZ_DATA[d].title} (${QUIZ_DATA[d].questions.length} Qs)</option>`).join('');
-  let html = `<div class="card">
-    <button class="mode-btn mix" onclick="startMix()">🔀 Mix Mode — 30 Random Questions (All Days)</button>
-    <div style="color:var(--muted);font-size:.85rem;margin:14px 0 4px;">या एक Day चुनें:</div>
+  const p=getProf(), L=levelOf(p.xp);
+  const opts=Object.keys(QUIZ_DATA).map(d=>`<option value="${d}">${p.best[d]?'✅ '+p.best[d]+'% — ':''}Day ${d} — ${QUIZ_DATA[d].title} (${QUIZ_DATA[d].questions.length} Qs)</option>`).join('');
+  app.innerHTML=`<div class="scorebar"><span>${L.name}</span><span>⭐ XP: <b>${p.xp}</b></span></div>
+  <div class="card"><div class="sec-title">📝 QUIZ</div>
+    <button class="mode-btn mix" onclick="startMix()">🔀 Mix Mode — 30 Random Questions</button>
     <select class="day-select" id="daySelect">${opts}</select>
-    <button class="mode-btn" style="background:var(--accent2);color:#04101a;" onclick="startDay(document.getElementById('daySelect').value)">▶️ Quiz शुरू करें</button>
-    <div style="color:var(--muted);font-size:.8rem;text-align:center;">🏏 सही = 4 runs · लगातार 3+ सही = 6 runs · गलत = Wicket<br>हर quiz में 3 Lifelines: ✂️ 50-50 · 💡 Hint · ⏭️ Skip</div>
-  </div>
-  <div class="card" style="text-align:center;">
-    <button class="mode-btn" style="background:#232738;color:var(--text);" onclick="renderLeaderboard()">🏆 Leaderboard देखें</button>
-  </div>`;
-  app.innerHTML = html;
+    <button class="mode-btn" style="background:var(--accent2);color:#04101a;" onclick="startDay(document.getElementById('daySelect').value)">▶️ Day Quiz शुरू करें</button>
+    <div style="color:var(--muted);font-size:.8rem;text-align:center;">🏏 सही = 4 runs · 3+ streak = 6 runs · गलत = Wicket · ⏱️ 30 सेकंड/सवाल<br>Lifelines: ✂️ 50-50 · 💡 Hint · ⏭️ Skip</div></div>
+  <div class="card"><div class="sec-title">🎤 SPEAKING ZONE</div>
+    <div class="btn-row">
+      <button class="mode-btn" onclick="startSpeak('bolo')">🎤 Bolo aur Runs Pao</button>
+      <button class="mode-btn" onclick="startSpeak('shadow')">🔁 Shadowing Round</button>
+      <button class="mode-btn" onclick="startSpeak('twister')">🌀 Tongue Twister</button>
+      <button class="mode-btn" onclick="startSpeak('filmy')">🎬 Filmy Dialogue</button>
+    </div>
+    <button class="mode-btn" style="margin-top:8px;background:linear-gradient(135deg,#ef476f,#ff6b35);color:#fff;" onclick="renderDaily()">🗣️ Daily 1-Minute Challenge</button></div>
+  <div class="card btn-row">
+    <button class="mode-btn" onclick="renderBadges()">🏅 My Progress</button>
+    <button class="mode-btn" onclick="renderLeaderboard()">🏆 Leaderboard</button></div>`;
 }
 
 function newState(mode, day, questions){
@@ -2543,6 +2538,69 @@ function lifelineHtml(disabled){
   return b('fifty','✂️ 50-50') + b('hint','💡 Hint') + b('skip','⏭️ Skip');
 }
 
+const QUESTION_TIME = 30; // seconds per question
+let timerId = null, timerDeadline = 0, lastBeepSec = null;
+
+function stopTimer(){ if(timerId){ clearInterval(timerId); timerId = null; } }
+
+function timerBeep(final){
+  try{
+    const ctx = getAudioCtx(); if(!ctx) return;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'square';
+    o.frequency.value = final ? 400 : 900;
+    const dur = final ? 0.45 : 0.12;
+    o.connect(g); g.connect(ctx.destination);
+    g.gain.setValueAtTime(0.12, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    o.start(); o.stop(ctx.currentTime + dur);
+  }catch(e){}
+}
+
+function updateTimerUI(sec, msLeft){
+  const t = document.getElementById('timeTxt');
+  const f = document.getElementById('timerFill');
+  if(t){ t.textContent = sec + 's'; t.classList.toggle('warn', sec <= 5); }
+  if(f){ f.style.width = Math.max(0, Math.min(100, msLeft / (QUESTION_TIME*1000) * 100)) + '%'; f.classList.toggle('warn', sec <= 5); }
+}
+
+function startTimer(){
+  stopTimer();
+  timerDeadline = Date.now() + QUESTION_TIME * 1000;
+  lastBeepSec = null;
+  updateTimerUI(QUESTION_TIME, QUESTION_TIME * 1000);
+  timerId = setInterval(tickTimer, 200);
+}
+
+function tickTimer(){
+  if(state.answered){ stopTimer(); return; }
+  const msLeft = timerDeadline - Date.now();
+  const sec = Math.max(0, Math.ceil(msLeft / 1000));
+  updateTimerUI(sec, msLeft);
+  // last 5 seconds: one beep per second (5,4,3,2,1)
+  if(sec >= 1 && sec <= 5 && sec !== lastBeepSec){ lastBeepSec = sec; timerBeep(false); }
+  if(msLeft <= 0){
+    stopTimer();
+    timerBeep(true);
+    showPhrasePopup("Time's up! ⏰", 'wrong');
+    skipQuestion(true);
+  }
+}
+
+function skipQuestion(auto){
+  stopTimer();
+  state.skipped++;
+  state.wrong.push(state.questions[state.idx]); // revision me dobara aayega
+  if(!auto){
+    state.life.skip = false;
+    showPhrasePopup('Skipped!', 'correct');
+  }
+  state.idx++;
+  state.answered = false;
+  if(state.idx >= state.questions.length){ renderResult(); return; }
+  renderQuestion();
+}
+
 function renderQuestion(){
   const q = state.questions[state.idx];
   // Fisher-Yates shuffle option order on every render — correct answer position is never predictable
@@ -2561,7 +2619,8 @@ function renderQuestion(){
   app.innerHTML = `
     <div class="badge">${badge}</div>
     <div class="progress"><div class="progress-bar" style="width:${pct}%"></div></div>
-    <div class="scorebar"><span>🏏 Score: <b id="runsTxt">${state.runs}/${state.wickets}</b></span><span>🔥 Streak: <b id="streakTxt">${state.streak}</b></span></div>
+    <div class="scorebar"><span>🏏 Score: <b id="runsTxt">${state.runs}/${state.wickets}</b></span><span>⏱️ <b id="timeTxt">${QUESTION_TIME}s</b></span><span>🔥 Streak: <b id="streakTxt">${state.streak}</b></span></div>
+    <div class="timerbar"><div class="timerfill" id="timerFill"></div></div>
     <div class="card">
       <div class="qcount">Question ${state.idx+1} / ${state.questions.length}</div>
       <div class="qtext-en">${q.en}</div>
@@ -2570,6 +2629,7 @@ function renderQuestion(){
       <div class="lifelines" id="lifeWrap">${lifelineHtml(false)}</div>
       <div id="explainWrap"></div>
     </div>`;
+  startTimer();
 }
 
 function hideWrongOptions(n){
@@ -2600,13 +2660,7 @@ function useLifeline(type){
     if(wrongOptionsLeft() < 2) return;
     hideWrongOptions(1);
   } else if(type === 'skip'){
-    state.life.skip = false;
-    state.skipped++;
-    state.wrong.push(state.questions[state.idx]); // revision me dobara aayega
-    showPhrasePopup('Skipped!', 'correct');
-    state.idx++;
-    if(state.idx >= state.questions.length){ renderResult(); return; }
-    renderQuestion();
+    skipQuestion(false);
     return;
   }
   state.life[type] = false;
@@ -2617,6 +2671,7 @@ function selectOpt(displayPos){
   if(state.answered || state.hidden.includes(displayPos)) return;
   unlockAudio();
   state.answered = true;
+  stopTimer();
   const q = state.questions[state.idx];
   const correctDisplayPos = state.currentCorrectDisplayPos;
   const correct = displayPos === correctDisplayPos;
@@ -2660,6 +2715,8 @@ function nextQuestion(){
 }
 
 function renderResult(){
+  stopTimer();
+  recordResult();
   const total = state.questions.length;
   const pct = Math.round((state.score/total)*100);
   const verdict = pct >= 80 ? '🏆 Man of the Match!' : pct >= 50 ? '👍 अच्छा खेले!' : '💪 Practice करो, अगला match आप जीतोगे!';
@@ -2699,6 +2756,121 @@ function renderLeaderboard(){
   `).join('') : `<div style="color:var(--muted);text-align:center;padding:10px;">अभी कोई स्कोर नहीं है।</div>`;
   app.innerHTML = `<div class="card"><h2 style="margin-top:0;">🏆 Leaderboard</h2>${rows}
     <a class="backlink" onclick="renderHome()" href="javascript:void(0)">← वापस Home पर जाएँ</a></div>`;
+}
+
+
+/* ===== PROFILE / XP / BADGES ===== */
+function getProf(){ let p=null; try{ p=JSON.parse(localStorage.getItem('fea_trb_profile')); }catch(e){} return p||{xp:0,best:{},spoken:0,bestStreak:0}; }
+function saveProf(p){ try{ localStorage.setItem('fea_trb_profile', JSON.stringify(p)); }catch(e){} }
+const LEVELS=[['🌱 Beginner',0],['📘 Learner',50],['🎓 Scholar',150],['🏆 Topper',300]];
+function levelOf(xp){ let l=LEVELS[0], n=LEVELS[1]; LEVELS.forEach((x,i)=>{ if(xp>=x[1]){ l=x; n=LEVELS[i+1]||null; } }); return {name:l[0], next:n}; }
+function confetti(){ for(let i=0;i<40;i++){ const e=document.createElement('div'); e.className='confetti'; e.textContent=['🎉','✨','🏏','⭐'][i%4]; e.style.left=(Math.random()*100)+'vw'; e.style.animationDelay=(Math.random()*0.8)+'s'; document.body.appendChild(e); setTimeout(()=>e.remove(),3500); } }
+function recordResult(){
+  const p=getProf(), total=state.questions.length, pct=Math.round(state.score/total*100);
+  p.xp+=state.score; p.bestStreak=Math.max(p.bestStreak||0,state.bestStreak);
+  if(state.mode==='day' && pct>(p.best[state.day]||0)) p.best[state.day]=pct;
+  saveProf(p); if(pct>=80) confetti();
+}
+function renderBadges(){
+  const p=getProf(), L=levelOf(p.xp), full=Object.keys(p.best).filter(d=>p.best[d]===100).length;
+  const list=[[p.xp>=1,'🌟 First Steps'],[(p.bestStreak||0)>=5,'🔥 5-Streak Star'],[(p.spoken||0)>=10,'🎤 Speaker (10 sentences)'],[full>=1,'💯 Day Master × '+full]].filter(b=>b[0]).map(b=>`<div class="lb-row"><span>${b[1]}</span></div>`).join('')||'<div style="color:var(--muted);text-align:center;padding:10px;">अभी कोई badge नहीं — quiz खेलो!</div>';
+  app.innerHTML=`<div class="card"><h2 style="margin-top:0;">🏅 My Progress</h2><div style="font-size:1.3rem;">${L.name}</div>
+    <div style="color:var(--muted);margin:4px 0 14px;">XP: ${p.xp}${L.next?' · अगला: '+L.next[0]+' @ '+L.next[1]+' XP':' · Top level! 🎉'}</div>${list}
+    <a class="backlink" onclick="renderHome()" href="javascript:void(0)">← वापस Home पर जाएँ</a></div>`;
+}
+
+/* ===== SPEAKING ZONE ===== */
+const SR_API=window.SpeechRecognition||window.webkitSpeechRecognition;
+const TWISTERS=["She sells sea shells by the sea shore.","Peter Piper picked a peck of pickled peppers.","How much wood would a woodchuck chuck?","Red lorry, yellow lorry.","Betty bought a bit of better butter."];
+const FILMY=["Believe in yourself, and the whole world will believe in you.","I will not give up until I win this match.","Every great story begins with one small step.","Hard work always wins in the end.","Dream big, work hard, and never stop smiling."];
+const SP_TITLE={bolo:'🎤 Bolo aur Runs Pao',shadow:'🔁 Shadowing Round',twister:'🌀 Tongue Twister Battle',filmy:'🎬 Filmy Dialogue Round'};
+let sp=null;
+function quizSentences(){ const out=[]; Object.values(QUIZ_DATA).forEach(d=>d.questions.forEach(q=>{ const s=q.opts[q.correct].replace(/^["“]|["”]$/g,'').trim(); const w=s.split(/\s+/).length; if(/^[A-Z][^?]*[.!]$/.test(s)&&w>=4&&w<=12) out.push(s); })); return out; }
+function startSpeak(kind){
+  const pool=kind==='twister'?TWISTERS:kind==='filmy'?FILMY:quizSentences();
+  sp={kind:kind, list:shuffle(pool).slice(0,8), i:0, runs:0};
+  renderSpeak();
+}
+function renderSpeak(){
+  if(sp.i>=sp.list.length){
+    if(sp.runs>=8) confetti();
+    app.innerHTML=`<div class="card" style="text-align:center;"><div style="font-size:1.1rem;color:var(--muted);">${SP_TITLE[sp.kind]}</div><div class="score-big">🏏 +${sp.runs} runs</div><div style="margin:10px 0 16px;">शाबाश! रोज़ थोड़ा-थोड़ा बोलो, fluency अपने-आप आएगी। 💪</div><button class="mode-btn" onclick="startSpeak('${sp.kind}')">🔁 दोबारा खेलें</button><button class="mode-btn mix" onclick="renderHome()">🏠 Home</button></div>`;
+    return;
+  }
+  app.innerHTML=`<div class="badge">${SP_TITLE[sp.kind]}</div><div class="card" style="text-align:center;">
+    <div class="qcount">${sp.i+1} / ${sp.list.length} · 🏏 Bonus runs: ${sp.runs}</div>
+    <div class="qtext-en" style="font-size:1.3rem;margin:14px 0;">${sp.list[sp.i]}</div>
+    <div class="btn-row" style="margin-bottom:10px;"><button class="mode-btn" onclick="listenCur()">🔊 सुनो</button><button class="mode-btn" style="background:var(--accent);color:#1a1200;" onclick="recordCur()">🎤 बोलो</button></div>
+    <div id="spRes" style="min-height:48px;margin-bottom:10px;"></div>
+    <button class="nextbtn" onclick="spNext()">⏭️ अगला</button>
+    <a class="backlink" onclick="renderHome()" href="javascript:void(0)">← Home</a></div>`;
+  if(sp.kind==='shadow') setTimeout(listenCur,300);
+}
+function listenCur(){ unlockAudio(); speak(sp.list[sp.i],'en-US'); }
+function spNext(){ sp.i++; renderSpeak(); }
+function matchPct(target,heard){
+  const n=s=>s.toLowerCase().replace(/[^a-z0-9\s']/g,'').split(/\s+/).filter(Boolean);
+  const tw=n(target), bag={}; let m=0;
+  n(heard).forEach(w=>bag[w]=(bag[w]||0)+1);
+  tw.forEach(w=>{ if(bag[w]>0){ m++; bag[w]--; } });
+  return tw.length?Math.round(m/tw.length*100):0;
+}
+function recordCur(){
+  unlockAudio();
+  const res=document.getElementById('spRes');
+  if(!SR_API){ res.innerHTML='❌ इस browser में voice check नहीं चलता। Chrome (Android/PC) use करें, या ऊपर 🔊 सुनकर खुद बोलें।'; return; }
+  const r=new SR_API(); r.lang='en-IN'; r.interimResults=false; r.maxAlternatives=1;
+  res.textContent='🎙️ सुन रहा हूँ... बोलिए!';
+  r.onresult=e=>{
+    const heard=e.results[0][0].transcript, pct=matchPct(sp.list[sp.i],heard);
+    if(pct>=70){
+      sp.runs+=2; const p=getProf(); p.spoken=(p.spoken||0)+1; p.xp+=2; saveProf(p);
+      playCorrectSound('SIX! Well spoken!');
+      res.innerHTML=`✅ ${pct}% match · +2 runs<br><small style="color:var(--muted)">आपने कहा: "${heard}"</small>`;
+    } else {
+      playWrongSound('Try again!');
+      res.innerHTML=`❌ ${pct}% match — फिर से 🎤 दबाएँ<br><small style="color:var(--muted)">आपने कहा: "${heard}"</small>`;
+    }
+  };
+  r.onerror=()=>{ res.textContent='⚠️ Mic permission दें या दोबारा try करें।'; };
+  try{ r.start(); }catch(e){}
+}
+
+/* ===== DAILY 1-MINUTE CHALLENGE ===== */
+const TOPICS=["My favourite cricketer","My family","My best friend","My dream job","My favourite movie","A festival I love","My daily routine"];
+let dcTimer=null, dcRec=null;
+function stopDaily(){ if(dcTimer){ clearInterval(dcTimer); dcTimer=null; } if(dcRec){ try{ dcRec.onend=null; dcRec.stop(); }catch(e){} dcRec=null; } }
+function renderDaily(){
+  stopDaily();
+  const topic=TOPICS[Math.floor(Date.now()/86400000)%TOPICS.length];
+  app.innerHTML=`<div class="badge">🗣️ Daily 1-Minute Challenge</div><div class="card" style="text-align:center;">
+    <div style="color:var(--muted);">आज का Topic</div><div class="qtext-en" style="font-size:1.4rem;margin:10px 0;">${topic}</div>
+    <div style="color:var(--muted);font-size:.85rem;margin-bottom:10px;">60 सेकंड में कम से कम 5 sentences बोलो। Start दबाओ और बोलना शुरू करो!</div>
+    <div class="score-big" id="dcTime">60</div><div id="dcRes" style="min-height:48px;margin:10px 0;"></div>
+    <button class="mode-btn" onclick="startDaily()">🎤 Start</button>
+    <a class="backlink" onclick="stopDaily();renderHome()" href="javascript:void(0)">← Home</a></div>`;
+}
+function startDaily(){
+  stopDaily(); unlockAudio();
+  let left=60, text='';
+  const res=document.getElementById('dcRes'), tm=document.getElementById('dcTime');
+  res.textContent=SR_API?'🎙️ रिकॉर्डिंग चालू — बोलिए!':'⏱️ बोलना शुरू करें (इस browser में voice check नहीं है)';
+  if(SR_API){
+    dcRec=new SR_API(); dcRec.lang='en-IN'; dcRec.continuous=true; dcRec.interimResults=false;
+    dcRec.onresult=e=>{ text=''; for(let i=0;i<e.results.length;i++) text+=e.results[i][0].transcript+' '; };
+    dcRec.onend=()=>{ if(left>0){ try{ dcRec.start(); }catch(e){} } };
+    try{ dcRec.start(); }catch(e){}
+  }
+  dcTimer=setInterval(()=>{
+    left--; tm.textContent=left;
+    if(left<=0){
+      stopDaily();
+      const words=text.trim()?text.trim().split(/\s+/).length:0;
+      const p=getProf(); const gain=Math.min(10,Math.floor(words/10)); p.xp+=gain; saveProf(p);
+      if(words>=40) confetti();
+      res.innerHTML=SR_API?`⏰ Time up! आपने लगभग <b>${words} words</b> बोले · +${gain} XP<br><small style="color:var(--muted)">${words>=60?'🔥 Excellent fluency!':words>=40?'👍 बहुत अच्छा!':'💪 अगली बार और बोलो!'}</small>`:'⏰ Time up! शाबाश — अब अपने दोस्त को सुनाओ। 👏';
+    }
+  },1000);
 }
 
 renderHome();
